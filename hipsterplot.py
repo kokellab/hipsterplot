@@ -33,18 +33,8 @@ if sys.version_info.major == 2:
     range = xrange
     from future_builtins import map, zip
 
-
-CHAR_LOOKUP_SYMBOLS = [(0, ' '), # Should be sorted
-                       (1, '.'),
-                       (2, ':'),
-                       #(3, '!'),
-                       (4, '|'),
-                       #(8, '+'),
-                       (float("inf"), '#')]
-
-def charlookup(num_chars):
-    """ Character for the given amount of elements in the bin """
-    return next(ch for num, ch in CHAR_LOOKUP_SYMBOLS if num_chars <= num)
+# ◌ ▪▼
+CHAR_LOOKUP_SYMBOLS = [(0, ' '),(10, '·'), (20, '▫'), (30, '▪'), (40, 'o'), (50, 'O'), (60, '□'), (70, '•'), (80, '⓿'), (90, '■'), (100, '█')]
 
 
 def bin_generator(data, bin_ends):
@@ -73,7 +63,13 @@ def enumerated_reversed(seq):
     return zip(range(len(seq) - 1, -1, -1), reversed(seq))
 
 
-def gen_plot(y_vals, x_vals=None, num_x_chars=70, num_y_chars=15):
+def gen_plot(y_vals, x_vals=None, num_x_chars=120, num_y_chars=15):
+
+    def charlookup(num_chars):
+        """ Character for the given amount of elements in the bin """
+        #print(num_chars)
+        return next(ch for num, ch in CHAR_LOOKUP_SYMBOLS if num_chars <= num)
+
     y_vals = list(y_vals)
     x_vals = list(x_vals) if x_vals else list(range(len(y_vals)))
     if len(x_vals) != len(y_vals):
@@ -91,14 +87,18 @@ def gen_plot(y_vals, x_vals=None, num_x_chars=70, num_y_chars=15):
     y_bin_ends = [ymin + (i+1) * y_bin_width for i in range(num_y_chars)]
 
     columns_pairs = bin_generator(zip(x_vals, y_vals), x_bin_ends)
-    yloop = lambda *args: [charlookup(len(el)) for el in bin_generator(*args)]
+    columns_pairs_argh = bin_generator(zip(x_vals, y_vals), x_bin_ends)
     ygetter = lambda iterable: map(itemgetter(1), iterable)
+    argh = lambda *args: [len(el) for el in bin_generator(*args)]
+    max_density = max(max(argh(ygetter(pairs), y_bin_ends)) for pairs in columns_pairs_argh)
+    print(max_density)
+    yloop = lambda *args: [charlookup(len(el) * 100 / max_density) for el in bin_generator(*args)]
     columns = (yloop(ygetter(pairs), y_bin_ends) for pairs in columns_pairs)
     rows = list(zip(*columns))
 
     for idx, row in enumerated_reversed(rows):
         y_bin_mid = y_bin_ends[idx] - y_bin_width * 0.5
-      return "{:10.4f} {}".format(y_bin_mid, "".join(row))
+        yield "{:.2E} {}".format(y_bin_mid, "".join(row))
 
 
 def plot(y_vals, x_vals=None, num_x_chars=70, num_y_chars=15):
@@ -110,21 +110,20 @@ def plot(y_vals, x_vals=None, num_x_chars=70, num_y_chars=15):
     The num_x_chars and num_y_chars inputs are respectively the width and
     height for the output plot to be printed, given in characters.
     """
-    print(gen_plot(y_vals, x_vals, num_x_chars, num_y_chars))
+    for p in gen_plot(y_vals, x_vals, num_x_chars, num_y_chars):
+        print(p)
 
 
 if __name__ == '__main__':
-    # Some examples
-    ys = [math.cos(x/5.0) for x in range(180)]
-    num_x_chars = min(70, len(ys))
-    plot(ys, num_x_chars=num_x_chars, num_y_chars=15)
-
-    xs = [50.0*random.random() for x in range(180)]
-    ys = [math.cos(x/5.0) for x in xs]
-    num_x_chars = min(70, len(ys))
-    plot(ys, x_vals=xs, num_x_chars=num_x_chars, num_y_chars=15)
-
-    k = 20
-    ys = [random.gauss(0, 0.5) + math.cos(x/5.0/k) for x in range(180*k)]
-    num_x_chars = min(160, len(ys))
-    plot(ys, num_x_chars=num_x_chars, num_y_chars=25)
+    #xs = [x**1.5+0.5*x*random.random() for x in range(1, int(round(120**1.5)))]
+    #print(list(sorted(xs)))
+    #ys = [math.cos(8*x**(0.5)/120.0)+5*random.random()/math.sqrt(x) for x in xs]
+    xs = list(range(-100, 100))
+    ys = [x**3 for x in xs]
+    ys2 = [2000*x+2000*random.random() if x % 10 != 0 else 7*10**5 for x in xs]
+    xs.extend(xs)
+    ys.extend(ys2)
+    num_x_chars = 120
+    print('')
+    plot(ys, x_vals=xs, num_x_chars=num_x_chars, num_y_chars=20)
+    print('')
