@@ -9,8 +9,8 @@ sdist.READMES = ("README.md",) # Includes it in the source distribution
 
 metadata = {
   "name": "hipsterplot",
-  "version": "0.1",
-  "author": "Ian Horn and Danilo J. S. Bellini",
+  "version": "0.2",
+  "author": "Ian Horn, Danilo J. S. Bellini, and Douglas Myers-Turnbull",
   "author_email": "horn.imh@gmail.com ; danilo.bellini.gmail.com",
   "url": "http://github.com/imh/hipsterplot",
   "description": "because matplotlib is too mainstream",
@@ -34,9 +34,6 @@ metadata["classifiers"] = [
   "Operating System :: POSIX :: Linux",
   "Operating System :: OS Independent",
   "Programming Language :: Python",
-  "Programming Language :: Python :: 2",
-  "Programming Language :: Python :: 2.6",
-  "Programming Language :: Python :: 2.7",
   "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.2",
   "Programming Language :: Python :: 3.3",
